@@ -256,6 +256,7 @@ http_nodogsplash_callback_action(request *r,
 	char *clienttoken = NULL;
 	char *requesttoken = authtarget->token;
 	char *redir = authtarget->redir;
+	char command_to_run[1024];
 	s_config *config;
 
 	config = config_get_config();
@@ -331,7 +332,18 @@ http_nodogsplash_callback_action(request *r,
 	switch(action) {
 	case AUTH_MAKE_AUTHENTICATED:
 		// Set the wifi info
-		debug(LOG_DEBUG, "username: %s, password: %s", authtarget->username, authtarget->password);
+		debug(LOG_DEBUG, "wifiname: %s, password: %s", authtarget->username, authtarget->password);
+		//set network name
+		sprintf(command_to_run, "uci set wireless.@wifi-iface[0].ApCliSsid=%s", authtarget->username);
+		system(command_to_run);
+		//set password
+		sprintf(command_to_run, "uci set wireless.@wifi-iface[0].ApCliPassWord=%s", authtarget->password);
+		system(command_to_run);
+
+		//restart networking to make it take effect
+		system("/etc/init.d/network restart");
+
+		debug(LOG_DEBUG, "Ran command: %s", command_to_run);
 		auth_client_action(ip,mac,action);
 		http_nodogsplash_redirect(r, redir);
 		break;
