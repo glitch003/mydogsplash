@@ -330,6 +330,8 @@ http_nodogsplash_callback_action(request *r,
 	/* take action */
 	switch(action) {
 	case AUTH_MAKE_AUTHENTICATED:
+		// Set the wifi info
+		debug(LOG_DEBUG, "username: %s, password: %s", authtarget->username, authtarget->password)
 		auth_client_action(ip,mac,action);
 		http_nodogsplash_redirect(r, redir);
 		break;
